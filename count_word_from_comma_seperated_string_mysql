@@ -1,0 +1,39 @@
+# Create MySQL function like this
+DELIMITER ||
+CREATE FUNCTION `FIND_WORD_IN_STRING`(`_list` TEXT, `_word` VARCHAR(50)) RETURNS int(11)
+    NO SQL
+BEGIN
+-- SANI: declaring variables
+DECLARE _next TEXT DEFAULT NULL;
+DECLARE _nextlen INT DEFAULT NULL;
+DECLARE _value TEXT DEFAULT NULL;
+DECLARE _total INT DEFAULT 0;
+
+-- SANI: Loop through all string
+iterator:
+LOOP
+  IF LENGTH(TRIM(_list)) = 0 OR _list IS NULL THEN
+    LEAVE iterator;
+  END IF;
+
+  SET _next = SUBSTRING_INDEX(_list,',',1);
+
+  SET _nextlen = LENGTH(_next);
+
+  SET _value = TRIM(_next);
+
+  IF _word = _next then
+	SET _total = _total+1;
+  END IF;
+
+  SET _list = INSERT(_list,1,_nextlen + 1,'');
+END LOOP;
+-- SANI: return how many found.
+return _total;
+
+END
+
+# Call function like this
+mysql> SELECT FIND_WORD_IN_STRING('A,B,A,D,AB,C,B,F,BA,A,AC','A');
+
+Where first param is comma seperated string and second param is a word to find
