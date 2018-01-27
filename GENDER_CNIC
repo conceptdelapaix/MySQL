@@ -1,0 +1,28 @@
+-- SANI: Get Gender from CNIC
+BEGIN
+
+	DECLARE inputdata VARCHAR(255);
+	DECLARE outputdata VARCHAR(50);
+
+-- SANI: Get last digit of string
+  	SET inputdata = substr(cnic, length(cnic), 1);
+
+
+-- SANI: Check if last digit is between 0-9
+	IF inputdata > 0 AND inputdata <=9 THEN
+
+-- SANI: Check if last digit is even or odd
+       IF inputdata%2 = 0 THEN
+  	   		SET outputdata =  'FEMALE';
+       ELSE
+			SET outputdata =  'MALE';
+       END IF;
+ 
+	ELSE
+  	   SET outputdata = null;
+	END IF;
+
+RETURN outputdata;
+
+
+END
