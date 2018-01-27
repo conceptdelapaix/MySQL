@@ -1,0 +1,24 @@
+-- SANI: Get province from CNic
+BEGIN
+
+	DECLARE inputdata VARCHAR(255);
+	DECLARE outputdata VARCHAR(50);
+
+-- SANI: Get last digit of string
+  	SET inputdata = substr(cnic, 1, 1);
+
+-- SANI: Tell From Which province is this
+    CASE 
+         WHEN inputdata = 1 THEN SET outputdata = 'Khyber Pakhtunkhwa';
+         WHEN inputdata = 2 THEN SET outputdata = 'Federally Administered Tribal Areas';
+         WHEN inputdata = 3 THEN SET outputdata = 'Punjab';
+         WHEN inputdata = 4 THEN SET outputdata = 'Sindh';
+         WHEN inputdata = 5 THEN SET outputdata = 'Balochistan';
+         WHEN inputdata = 6 THEN SET outputdata = 'Islamabad Capital Territory';
+         WHEN inputdata = 7 THEN SET outputdata = 'Gilgit-Baltistan';
+    END CASE;
+
+RETURN outputdata;
+
+
+END
