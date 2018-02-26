@@ -1,0 +1,201 @@
+return xx Year, xxx Months, xxx Week, xxx Days, xxx Hours, xxx Minutes, xxx Sec ago
+
+# Script is as follow:
+
+delimiter ||
+CREATE  FUNCTION `TIME_AGO`(`inputDate` DATETIME) RETURNS varchar(255) CHARSET latin1
+    NO SQL
+BEGIN
+    -- SANI: Declaring some variables
+    DECLARE currentDate INT(11);
+    DECLARE olderDate   INT(11);
+    DECLARE seconds     INT(11);
+    DECLARE Result      VARCHAR(100);
+
+		DECLARE yearsFrictions   FLOAT;
+		DECLARE decadeFrictions  FLOAT;
+		DECLARE monthsFrictions  FLOAT;
+		DECLARE weekFrictions    FLOAT;
+    DECLARE daysFrictions    FLOAT;
+    DECLARE hoursFrictions   FLOAT;
+		DECLARE minutesFrictions FLOAT;
+
+		DECLARE years   INT(11);
+    DECLARE months  INT(11);
+		DECLARE weeks   INT(11);
+		DECLARE days    INT(11);
+    DECLARE hours   INT(11);
+    DECLARE minutes INT(11);
+
+    DECLARE _year   INT(11);
+    DECLARE _month  INT(11);
+    DECLARE _week   INT(11);
+    DECLARE _day    INT(11);
+    DECLARE _hour   INT(11);
+    DECLARE _minute INT(11);
+    DECLARE _second INT(11);
+    
+  DECLARE oneMinute  INT(11); -- SANI: Seconds,     1 Min = 60 Sec
+	DECLARE oneHour    INT(11); -- SANI: 60 Min = 60 x 60 = 3600 Sec = 1 Hour
+	DECLARE oneDay     INT(11); -- SANI: 1 hr = 60 Min, 24 Hr = 60*24 = 1140 Min, 1 Day = 1140*60 = 86400 Sec
+	DECLARE oneWeek    INT(11); -- SANI: 1 day = 86400 sec, 7 days = 86400 x 7 = 604800 Sec = 1 week
+	DECLARE oneMonth   INT(11); -- SANI: 
+	DECLARE oneYear    INT(11); -- SANI: 1 Month = 2630880 sec, 12 Months = 2630880 x 12 = 31570560 Sec = 1 Year
+	DECLARE oneDecade  INT(11); -- SANI: 
+	DECLARE century    INT(11); -- SANI:
+    
+    -- SANI: change date to timestamp
+    SET currentDate = UNIX_TIMESTAMP(NOW());
+    SET olderDate   = UNIX_TIMESTAMP(inputDate);
+    
+  SET oneMinute              = 60;               -- SANI: Seconds,     1 Min = 60 Sec
+	SET oneHour                = oneMinute*60;     -- SANI: 60 Min = 60 x 60 = 3600 Sec = 1 Hour
+	SET oneDay                 = oneHour*24;     -- SANI: 1 hr = 60 Min, 24 Hr = 60*24 = 1140 Min, 1 Day = 1140*60 = 86400 Sec
+	SET oneWeek                = oneDay*7;         -- SANI: 1 day = 86400 sec, 7 days = 86400 x 7 = 604800 Sec = 1 week
+	SET oneMonth               = oneDay*(DAY(LAST_DAY(inputDate))); 
+	SET oneYear                = oneMonth*12;      -- SANI: 1 Month = 2630880 sec, 12 Months = 2630880 x 12 = 31570560 Sec = 1 Year
+	SET oneDecade              = oneYear*10;
+	SET century                = oneDecade*10;
+ 
+
+    -- SANI: verify if date is older
+    IF currentDate > olderDate THEN
+      SET seconds = currentDate-olderDate;
+      
+      	
+           -- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  SANI: Logic @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
+            IF seconds > 0 AND seconds <= 5 THEN
+							SET Result = "Just now";
+						ELSEIF seconds > 5 AND seconds < oneMinute THEN            -- //SANI: 60 Sec = 1 Minute
+								SET Result = CONCAT(seconds," sec ago ",oneMinute);
+
+						ELSEIF seconds >= oneMinute AND seconds < oneHour THEN  -- //SANI: 3600 Sec = 60 x 60 = 1 Hour = (Minutes x Seconds)
+								SET minutesFrictions = (seconds/oneMinute);
+								SET	minutes          = CAST(minutesFrictions AS UNSIGNED);
+								SET _second           = (seconds%oneMinute);
+									
+								SET Result = CONCAT(minutes," minutes ",_second," sec ago");
+									
+						ELSEIF seconds >= oneHour AND seconds < oneDay THEN  -- //SANI: 86400 = ((60*60)*24) =     1  Day = ((Minutes x Seconds) x hour)
+										SET	hoursFrictions 	= seconds/oneHour;
+										SET hours  			    = CAST(hoursFrictions AS UNSIGNED);
+										SET minutes 			  =  seconds%oneHour;
+													-- //SANI: For Hours
+												SET minutesFrictions 	= (minutes/oneMinute);
+												SET _minute 			      = CAST(minutesFrictions AS UNSIGNED);
+												SET _second 			      = (minutes%oneMinute);
+											
+											SET Result =  CONCAT(hours," Hour ",_minute," minutes ",_second," sec ago");
+											
+							ELSEIF seconds >= oneDay AND seconds < oneWeek THEN   -- //SANI: 1 Week = (((Minutes x Seconds) x hour) x Days)
+									   -- //SANI: For Days
+												SET daysFrictions = seconds/oneDay;
+												SET days          = CAST(daysFrictions AS UNSIGNED);
+												SET hours         = seconds%oneDay;
+													-- //SANI: For Hours
+													SET hoursFrictions 	= hours/oneHour;
+													SET _hour  				  = CAST(hoursFrictions AS UNSIGNED);
+													SET minutes 			  =  hours%oneHour;
+														-- //SANI: For Minutes
+														SET minutesFrictions 	= minutes/oneMinute;
+														SET _minute				    = CAST(minutesFrictions AS UNSIGNED);
+														SET _second 			      = minutes%oneMinute;
+													
+												
+												SET Result = CONCAT(days," Days ",_hour," Hours ",_minute," minutes ",_second," sec ago");
+											ELSEIF seconds >= oneWeek AND seconds < oneMonth THEN  -- //SANI: 1 Month = ((((Minutes x Seconds) x hour) x Days) X week)
+												-- 		//SANI: For Days
+														SET MonthsFrictions = seconds/oneWeek;
+														SET Weeks         	 = CAST(MonthsFrictions AS UNSIGNED);
+														SET _Day           	 = seconds%oneWeek;
+														
+															-- //SANI: For Days
+															SET daysFrictions = _Day/oneDay;
+															SET days          = CAST(daysFrictions AS UNSIGNED);
+															SET hours         = _Day%oneDay;
+																-- //SANI: For Hours
+																SET hoursFrictions 	= hours/oneHour;
+																SET _hour  				= CAST(hoursFrictions AS UNSIGNED);
+																SET minutes 			=  hours%oneHour;
+																	-- //SANI: For Minutes
+																	SET minutesFrictions 	= minutes/oneMinute;
+																	SET _minute				    = CAST(minutesFrictions AS UNSIGNED);
+																	SET _second 			      =  minutes%oneMinute;
+															
+														
+														SET Result = CONCAT(Weeks," Weeks ",days," Days ",_hour," Hours ",_minute," minutes ",_second," sec ago");
+														
+													ELSEIF seconds >= oneMonth AND seconds < oneYear THEN --  //SANI: 1 Year = (((((Minutes x Seconds) x hour) x Days) X week)) x Months
+														-- 	//SANI: For Month
+															SET yearsFrictions  = seconds/oneMonth;
+															SET Months        	 = CAST(yearsFrictions AS UNSIGNED);
+															SET _Week          	 = seconds%oneMonth;
+															
+																-- //SANI: For Days
+																SET MonthsFrictions = _Week/oneWeek;
+																SET Weeks         	 = CAST(MonthsFrictions AS UNSIGNED);
+																SET _Day           	 = _Week%oneWeek;
+																
+																	-- //SANI: For Days
+																	SET daysFrictions = _Day/oneDay;
+																	SET days          = CAST(daysFrictions AS UNSIGNED );
+																	SET hours         = _Day%oneDay;
+																		-- //SANI: For Hours
+																		SET hoursFrictions 	= hours/oneHour;
+																		SET _hour  				  = CAST(hoursFrictions AS UNSIGNED);
+																		SET minutes 			  = hours%oneHour;
+																			-- //SANI: For Minutes
+																			SET minutesFrictions 	= minutes/oneMinute;
+																			SET _minute				    = CAST(minutesFrictions AS UNSIGNED);
+																			SET _second 			      = minutes%oneMinute;
+																
+															
+															SET Result = CONCAT(Months," Months ",Weeks," Weeks ",days," Days ",_hour," Hours ",_minute," minutes ",_second," sec ago");
+															
+														ELSEIF seconds >= oneYear  THEN 
+														-- 	//SANI: For Month
+															SET decadeFrictions = seconds/oneYear;
+															SET Years        	  = CAST(decadeFrictions AS UNSIGNED);
+															SET _Month         	= seconds%oneYear;
+															
+																-- //SANI: For Month
+																SET yearsFrictions   = _Month/oneMonth;
+																SET Months        	 = CAST(yearsFrictions AS UNSIGNED);
+																SET _Week          	 = _Month%oneMonth;
+																
+																	-- //SANI: For Days
+																	SET MonthsFrictions  = _Week/oneWeek;
+																	SET Weeks         	 = CAST(MonthsFrictions AS UNSIGNED);
+																	SET _Day           	 = _Week%oneWeek;
+																	
+																		-- //SANI: For Days
+																		SET daysFrictions = _Day/oneDay;
+																		SET days          = CAST(daysFrictions AS UNSIGNED);
+																		SET hours         = _Day%oneDay;
+																			-- //SANI: For Hours
+																			SET hoursFrictions 	= hours/oneHour;
+																			SET _hour  				  = CAST(hoursFrictions AS UNSIGNED);
+																			SET minutes 			  = hours%oneHour;
+																				-- //SANI: For Minutes
+																				SET minutesFrictions 	= minutes/oneMinute;
+																				SET _minute				    = CAST(minutesFrictions AS UNSIGNED);
+																				SET _second 			      = minutes%oneMinute;
+																
+															
+															SET Result = CONCAT(Years," Years ",Months," Months ",Weeks," Weeks ",days," Days ",_hour," Hours ",_minute," minutes ",_second," sec ago");
+														
+														ELSE
+															SET Result = 0;
+														END IF;
+           -- @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  SANI: Logic @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        
+      
+      
+    ELSE
+      SET Result = 0;
+    END IF;
+    
+    
+    return Result;
+
+END
