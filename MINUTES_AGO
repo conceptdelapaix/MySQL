@@ -1,0 +1,58 @@
+// This program tell How many minutes ago is your provided date.
+
+It has three different options for second parameter
+"SECONDS, FRACTIONS, STRING"
+
+# Return seconds only
+SELECT MINUTES_AGO('2018-02-26 12:22:00', 'SECONDS') howlong;
+
+# Return Minutes & Seconds in decimal form
+SELECT MINUTES_AGO('2018-02-26 12:22:00', 'FRACTIONS') howlong;
+
+# Return String to tell how many, minutes and seconds ago, is your provided date 
+SELECT MINUTES_AGO('2018-02-26 12:45:00', 'STRING') howlong;
+
+
+# Mysql stored function is 
+
+delimiter ||
+CREATE FUNCTION `MINUTES_AGO`(`inputDate` DATETIME, `whatReturn` VARCHAR(100)) RETURNS varchar(100) CHARSET latin1
+    NO SQL
+BEGIN
+    -- SANI: Declaring some variables
+    DECLARE currentDate VARCHAR(100);
+    DECLARE olderDate VARCHAR(100);
+    DECLARE seconds VARCHAR(100);
+    DECLARE fraction VARCHAR(100);
+    DECLARE remainder VARCHAR(100);
+    DECLARE minutes VARCHAR(100);
+    DECLARE Result VARCHAR(100);
+    
+    -- SANI: change date to timestamp
+    SET currentDate = UNIX_TIMESTAMP(NOW());
+    SET olderDate   = UNIX_TIMESTAMP(inputDate);
+    
+    -- SANI: verify if date is older
+    IF currentDate > olderDate THEN
+      SET seconds = currentDate-olderDate;
+      
+      	-- SANI: What output required
+        IF whatReturn = "FRACTIONS" THEN
+            SET Result = seconds/60;
+        ELSEIF whatReturn = "STRING" THEN
+            SET fraction  = seconds/60;
+            SET minutes   = CAST(fraction AS UNSIGNED);  
+            SET remainder = seconds%60; 
+            SET Result   = CONCAT(minutes, ' minutes ', remainder, ' seconds ago');  
+        ELSE
+        	SET Result = seconds;
+        END IF;
+      
+      
+    ELSE
+      SET Result = 0;
+    END IF;
+    
+    
+    return Result;
+END
