@@ -1,0 +1,51 @@
+# Calculate distance between two coordinates in mysql
+DELIMITER !!
+CREATE FUNCTION `CALCULATE_DISTANCE`(`centerpoint` VARCHAR(255), `movingpoint` VARCHAR(255), `unit` ENUM('KM','MI')) RETURNS varchar(255) CHARSET latin1
+    NO SQL
+BEGIN
+
+-- SANI: DECLARING VARIABLES FOR START POINT
+DECLARE firstPoint VARCHAR(255);
+DECLARE firstLatitude float;
+DECLARE firstLongitude float;
+
+-- SANI: DECLARING VARIABLES FOR END POINT
+DECLARE secondPoint VARCHAR(255);
+DECLARE secondLatitude float;
+DECLARE secondLongitude float;
+
+-- SANI: declaring variables for distance
+DECLARE distance float;
+DECLARE radius int;
+DECLARE meter int;
+DECLARE distanceInMeter float;
+
+-- SANI: Split comma seperated string
+SET firstPoint	   = centerpoint;
+SET firstLatitude  = SUBSTRING_INDEX(firstPoint,',',1);
+SET firstLongitude = SUBSTRING_INDEX(firstPoint,',',-1);
+
+-- SANI: Split comma seperated string
+SET secondPoint	    = centerpoint;
+SET secondLatitude  = SUBSTRING_INDEX(movingpoint,',',1);
+SET secondLongitude = SUBSTRING_INDEX(movingpoint,',',-1);
+
+IF unit = "KM" THEN
+	SET radius = 6371;
+ELSE
+	SET radius = 3959;
+END IF;
+
+-- SANI: Find distance between two points in km
+SET distance = radius * 2 * ASIN(SQRT(
+            POWER(SIN((firstLatitude - abs(secondLatitude)) * pi()/180 / 2),
+            2) + COS(firstLatitude * pi()/180 ) * COS(abs(secondLatitude) *
+            pi()/180) * POWER(SIN((firstLongitude - secondLongitude) *
+pi()/180 / 2), 2) ));
+
+
+
+
+RETURN distance;
+
+END
