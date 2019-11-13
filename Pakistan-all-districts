@@ -1,0 +1,216 @@
+
+
+CREATE TABLE IF NOT EXISTS `tbl_provinces` (
+  `prv_id` int(11) NOT NULL AUTO_INCREMENT,
+  `prv_name` varchar(255) NOT NULL,
+  `prv_status` tinyint(4) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`prv_id`),
+  UNIQUE KEY `prv_name` (`prv_name`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
+
+--
+-- Dumping data for table `tbl_provinces`
+--
+
+INSERT INTO `tbl_provinces` (`prv_id`, `prv_name`, `prv_status`) VALUES
+(1, 'Azad Jammu and Kashmir', 0),
+(2, 'Balochistan', 0),
+(3, 'Federally Administered Tribal Areas (FATA)', 0),
+(4, 'Gilgit–Baltistan', 0),
+(5, 'Khyber Pakhtunkhwa (KPK)', 0),
+(6, 'Punjab', 1),
+(7, 'Sindh', 0);
+
+DELIMITER $$
+--
+-- Events
+--
+CREATE DEFINER=`root`@`localhost` EVENT `session_expire` ON SCHEDULE EVERY 1 MINUTE STARTS '2019-08-23 16:29:07' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE help_requests
+SET session_started = 0, session_completed = 1, request_status = 'COMPLETED', completed_time = now()
+WHERE (unix_timestamp() -  unix_timestamp(request_datetime)) > 40*60 
+AND session_started = 1 AND request_status <> 'COMPLETED'$$
+
+DELIMITER ;
+
+
+
+CREATE TABLE tbl_districts (
+  dist_id int(11) NOT NULL AUTO_INCREMENT,
+  dist_province_idfk int(11) DEFAULT NULL,
+  dist_name varchar(255) DEFAULT NULL,
+  dist_status tinyint(4) DEFAULT '1',
+  PRIMARY KEY (dist_id),
+  KEY dist_province_idfk (dist_province_idfk)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+
+
+
+insert into tbl_districts(dist_province_idfk, 	dist_name, dist_status) values
+('1', 'Muzaffarabad', 0),
+('1', 'Hattian Bala', 0),
+('1', 'Neelum', 0),
+('1', 'Mirpur', 0),
+('1', 'Bhimber', 0),
+('1', 'Kotli', 0),
+('1', 'Poonch', 0),
+('1', 'Bagh', 0),
+('1', 'Haveli', 0),
+('1', 'Sudhnati', 0);
+
+
+
+insert into tbl_districts(dist_province_idfk, 	dist_name, dist_status) values
+('6', 'Attock', 1),
+('6', 'Bahawalnagar', 1),
+('6', 'Bahawalpur', 1),
+('6', 'Bhakkar', 1),
+('6', 'Chakwal', 1),
+('6', 'Chiniot', 1),
+('6', 'Dera Ghazi Khan', 1),
+('6', 'Faisalabad', 1),
+('6', 'Gujranwala', 1),
+('6', 'Gujrat', 1),
+('6', 'Hafizabad', 1),
+('6', 'Jhang', 1),
+('6', 'Jhelum', 1),
+('6', 'Kasur', 1),
+('6', 'Khanewal', 1),
+('6', 'Khushab', 1),
+('6', 'Lahore', 1),
+('6', 'Layyah', 1),
+('6', 'Lodhran', 1),
+('6', 'Mandi Bahauddin', 1),
+('6', 'Mianwali', 1),
+('6', 'Multan', 1),
+('6', 'Muzaffargarh', 1),
+('6', 'Narowal', 1),
+('6', 'Nankana Sahib', 1),
+('6', 'Okara', 1),
+('6', 'Pakpattan', 1),
+('6', 'Rahim Yar Khan', 1),
+('6', 'Rajanpur', 1),
+('6', 'Rawalpindi', 1),
+('6', 'Sahiwal', 1),
+('6', 'Sargodha', 1),
+('6', 'Sheikhupura', 1),
+('6', 'Sialkot', 1),
+('6', 'Toba Tek Singh', 1),
+('6', 'Vehari', 1);
+
+
+insert into tbl_districts(dist_province_idfk, 	dist_name, dist_status) values
+('2', 'Awaran', 0),
+('2', 'Barkhan', 0),
+('2', 'Chagai', 0),
+('2', 'Dera Bugti', 0),
+('2', 'Gwadar', 0),
+('2', 'Harnai', 0),
+('2', 'Jafarabad', 0),
+('2', 'Jhal Magsi', 0),
+('2', 'Kachhi', 0),
+('2', 'Kalat', 0),
+('2', 'Kech', 0),
+('2', 'Kharan', 0),
+('2', 'Khuzdar', 0),
+('2', 'Killa Abdullah', 0),
+('2', 'Killa Saifullah', 0),
+('2', 'Kohlu', 0),
+('2', 'Lasbela', 0),
+('2', 'Lehri', 0),
+('2', 'Loralai', 0),
+('2', 'Mastung', 0),
+('2', 'Musakhel', 0),
+('2', 'Nasirabad', 0),
+('2', 'Nushki', 0),
+('2', 'Panjgur', 0),
+('2', 'Pishin', 0),
+('2', 'Quetta', 0),
+('2', 'Sherani', 0),
+('2', 'Sibi', 0),
+('2', 'Sohbatpur', 0),
+('2', 'Washuk', 0),
+('2', 'Zhob', 0),
+('2', 'Ziarat', 0),
+('2', 'Duki', 0);
+
+
+insert into tbl_districts(dist_province_idfk, 	dist_name, dist_status) values
+('4', 'Ghanche', 0),
+('4', 'Skardu', 0),
+('4', 'Astore', 0),
+('4', 'Diamer', 0),
+('4', 'Ghizer', 0),
+('4', 'Gilgit', 0),
+('4', 'Hunza', 0),
+('4', 'Kharmang', 0),
+('4', 'Shigar', 0),
+('4', 'Nagar', 0);
+
+
+insert into tbl_districts(dist_province_idfk, 	dist_name, dist_status) values
+('5', 'Abbottabad', 0),
+('5', 'Bajaur', 0),
+('5', 'Bannu', 0),
+('5', 'Battagram', 0),
+('5', 'Buner', 0),
+('5', 'Charsadda', 0),
+('5', 'Chitral', 0),
+('5', 'Dera Ismail Khan', 0),
+('5', 'Hangu', 0),
+('5', 'Haripur', 0),
+('5', 'Karak', 0),
+('5', 'Khyber', 0),
+('5', 'Kohat', 0),
+('5', 'Kurram', 0),
+('5', 'Lakki Marwat', 0),
+('5', 'Lower Dir', 0),
+('5', 'Lower Kohistan', 0),
+('5', 'Malakand', 0),
+('5', 'Mansehra', 0),
+('5', 'Mardan', 0),
+('5', 'Mohmand', 0),
+('5', 'North Waziristan', 0),
+('5', 'Nowshera', 0),
+('5', 'Orakzai', 0),
+('5', 'Peshawar', 0),
+('5', 'Shangla', 0),
+('5', 'South Waziristan', 0),
+('5', 'Swabi', 0),
+('5', 'Swat', 0),
+('5', 'Tank', 0),
+('5', 'Torghar', 0),
+('5', 'Upper Dir', 0),
+('5', 'Upper Kohistan', 0);
+
+
+
+insert into tbl_districts(dist_province_idfk, 	dist_name, dist_status) values
+('7', 'Badin', 0),
+('7', 'Dadu', 0),
+('7', 'Ghotki', 0),
+('7', 'Hyderabad', 0),
+('7', 'Jacobabad', 0),
+('7', 'Jamshoro', 0),
+('7', 'Karachi Central', 0),
+('7', 'Karachi East', 0),
+('7', 'Karachi South', 0),
+('7', 'Karachi West', 0),
+('7', 'Kashmore', 0),
+('7', 'Khairpur', 0),
+('7', 'Korangi', 0),
+('7', 'Larkana', 0),
+('7', 'Malir', 0),
+('7', 'Matiari', 0),
+('7', 'Mirpur Khas', 0),
+('7', 'Naushahro Feroze', 0),
+('7', 'Qambar Shahdadkot', 0),
+('7', 'Sanghar', 0),
+('7', 'Shaheed Benazir Abad', 0),
+('7', 'Shikarpur', 0),
+('7', 'Sujawal', 0),
+('7', 'Sukkur', 0),
+('7', 'Tando Allahyar', 0),
+('7', 'Tando Muhammad Khan', 0),
+('7', 'Tharparkar', 0),
+('7', 'Thatta', 0),
+('7', 'Umerkot', 0);
