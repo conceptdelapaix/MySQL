@@ -1,0 +1,40 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` FUNCTION `GET_MAX_LENGTH_URDU`(`inputstring` TEXT CHARSET utf8, `Delim` VARCHAR(10)) RETURNS int(11)
+    NO SQL
+BEGIN
+		-- SANI: Declare variables
+        DECLARE inipos INT;
+        DECLARE endpos INT;
+        DECLARE maxlen INT;
+        DECLARE fullstr VARCHAR(2000);
+        DECLARE item VARCHAR(2000);
+        DECLARE maxword VARCHAR(2000);
+        DECLARE prevmaxword VARCHAR(2000);
+        
+        -- SANI: Initializing variable  
+        SET inipos = 1;
+        SET fullstr = CONCAT( CONVERT(inputstring USING utf8), delim);
+        SET maxlen = CHAR_LENGTH(fullstr);
+        SET maxword = "";
+        SET prevmaxword = ".";
+
+		-- SANI: Loop through all provided string
+        REPEAT
+            SET endpos = LOCATE(delim, fullstr, inipos); -- SANI: Get the end position of each word one by one
+            SET item =  SUBSTR(fullstr, inipos, endpos - inipos); -- SANI: Get each word one by one
+           
+            -- SANI: If word is not empty
+            IF item <> '' AND item IS NOT NULL THEN
+                
+                -- SANI: Check if current word length is greater than previous word 
+                IF CHAR_LENGTH(item) > CHAR_LENGTH(prevmaxword) THEN
+                   SET prevmaxword = item; -- SANI: Store max length word
+                END IF;   
+                
+            END IF;
+            SET inipos = endpos + 1;
+        UNTIL inipos >= maxlen END REPEAT;
+       
+       RETURN CHAR_LENGTH(prevmaxword);
+    END$$
+DELIMITER ;
