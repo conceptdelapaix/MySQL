@@ -1,0 +1,14 @@
+DELIMITER $$
+CREATE  FUNCTION `COUNT_CHARACTER`(`inputstring` VARCHAR(255), `Delim` VARCHAR(10)) RETURNS int(11)
+    NO SQL
+BEGIN
+
+ return ROUND (   
+	        (
+	            LENGTH(inputstring)
+	            - LENGTH( REPLACE ( inputstring, Delim, "") ) 
+	        ) / LENGTH(Delim)        
+	    );
+END$$
+DELIMITER ;
+    
