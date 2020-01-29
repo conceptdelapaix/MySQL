@@ -1,0 +1,12 @@
+DELIMITER $$
+CREATE  FUNCTION `IS_NUMERIC`(`inputValue` VARCHAR(255)) RETURNS tinyint(1)
+    NO SQL
+BEGIN
+    IF (inputValue REGEXP ('^[0-9]+$'))
+    THEN
+      RETURN true;
+    ELSE
+      RETURN false;
+    END IF;
+  END$$
+DELIMITER ;
